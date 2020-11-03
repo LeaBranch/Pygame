@@ -1,0 +1,192 @@
+СОЗДАНИЕ ИГР НА Pygame
+
+1  Шаблон  ==================================================
+import sys, pygame
+pygame.init() # инициализация
+
+size = width, height = 800, 600 # размеры приложения
+speed = [1, 1] # координаты для скорости(?)
+black = 0, 0, 0 # цвет фона
+
+screen = pygame.display
+screenMode = screen.set_mode(size) # создаёт экран с размерами
+screen.set_caption("Ball") # задаёт заголовок
+
+ball = pygame.image.load("intro_ball.gif") # добавляем текстуру
+ballrect = ball.get_rect() # создаём объект
+
+while(1): # рабочий цикл
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: sys.exit() # закрываем приложение по нажатию красной кнопки
+
+    ballrect = ballrect.move(speed) # движение (меняем координаты на противоположные)
+    if ballrect.left < 0 or ballrect.right > width:
+        speed[0] = -speed[0] # по х
+    if ballrect.top < 0 or ballrect.bottom > height:
+        speed[1] = -speed[1] # по у
+
+    screenMode.fill(black) # закрасить экран
+    screenMode.blit(ball, ballrect) # наложить текстуру на объект
+    pygame.display.flip() # ОБНОВИТЬ ЭКРАН
+
+2  Работа с клавиатурой ======================================
+
+while(1):
+    ...
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_ESCAPE]:
+        sys.exit()
+
+3   Анимация движения персонажа ======================================
+
+dinoIMG = [pygame.image.load("./assets/dino/1.png"), pygame.image.load("./assets/dino/2.png"), pygame.image.load("./assets/dino/3.png"), 
+pygame.image.load("./assets/dino/4.png"), pygame.image.load("./assets/dino/5.png")]
+
+dinoCounter = 0
+
+def drawDino():
+    global dinoCounter
+    if dinoCounter == 25: 
+        dinoCounter = 0
+
+    screenMode.blit(dinoIMG[dinoCounter // 5], (dino_x, dino_y))
+    dinoCounter += 1
+
+4   Вывод текста на экран ======================================
+
+def printText(message, x, y, font_color = (0, 0, 0), font_type = "./assets/PingPong.ttf", font_size = 30):
+    font_type = pygame.font.Font(font_type, font_size)
+    text = font_type.render(message, True, font_color)
+    screenMode.blit(text, (x, y))
+
+5   Пауза ======================================
+
+def paused():
+    global height, width
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if (event.type == pygame.QUIT): sys.exit() 
+
+        # screenMode.fill((0,255,0))
+        printText("Paused. Press Enter to continue", width/3, height/2)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RETURN]:
+            paused = False
+
+        if keys[pygame.K_F10]:
+            sys.exit()
+
+        screen.update()
+        clock.tick(15)
+
+if keys[pygame.K_ESCAPE]:
+        paused()
+
+6   Коллизия ======================================
+
+def checkCollision(barriers):
+    for barrier in barriers:
+        if not make_jump: # если не сделан прыжок, проверяем по х
+            if (barrier.x <= (dino_x + dino_w - 5) <= (barrier.x + barrier.w)):
+                return True
+
+        elif (jump_counter == 10): # начало первой половины прыжка
+            if ((dino_y + dino_h - 5) >= barrier.y): # если столкновение по у
+                if (barrier.x <= (dino_x + dino_w - 5) <= (barrier.x + barrier.w)): # проверяем по х
+                    return True
+        elif (jump_counter >= -1): # начало второй половины прыжка
+            if ((dino_y + dino_h - 5) >= barrier.y): # если столкновение по у
+                if (barrier.x <= (dino_x + dino_w - 35) <= (barrier.x + barrier.w)): # проверка по х
+                    return True
+            else:
+                if ((dino_y + dino_h - 10) >= barrier.y): # проверка по у
+                    if (barrier.x <= (dino_x + 5) <= (barrier.x + barrier.w)): # проверка по х
+                        return True
+    return False
+
+if (checkCollision(cactusArr)):
+    game = False
+
+6   Здоровье ======================================
+
+health = 2
+
+def objectReturn(objects, obj):
+    distance = cactusDistance(objects)
+
+    choice = random.randrange(0, 3)
+    img = cactusIMG[choice]
+    w = cactus_options[choice * 2]
+    h = cactus_options[choice * 2 + 1]
+
+    obj.return_self(distance, h, w, img)
+
+def checkHealth():
+    global health
+    health -= 1
+    if (health == 0):
+        pygame.mixer.Sound.play(lossSound)
+        return False
+    else:
+        pygame.mixer.Sound.play(fallSound)
+        return True
+
+def checkCollision(barriers):
+    if checkHealth(): 
+        objectReturn(barriers, barrier)
+        return False
+    else:
+        return True
+
+if (checkCollision(cactusArr)): # если коллизия - -здоровье
+    game = False
+
+7   Выстрелы по нажатию кнопки ======================================
+
+bulletSound = pygame.mixer.Sound("./assets/sounds/shot.wav")
+
+bulletIMG = pygame.image.load("./assets/textures/shot.png")
+bulletIMG = pygame.transform.scale(bulletIMG, (30, 9)) # подгоняем картинку под нужный размер
+
+cooldown = 0 # счётчик перезаряда
+
+class Bullet:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.speed = 8
+
+    def move(self):
+        global width
+        self.x += self.speed
+        if (self.x <= width):
+            screenMode.blit(bulletIMG, (self.x, self.y))
+            return True
+        else:
+            return False
+
+def game_cycle():
+    global cooldown
+
+    allBullets = []
+
+    while(game):
+        screenMode.fill(sky)
+
+        keys = pygame.key.get_pressed()
+
+        if not cooldown:
+            if keys[pygame.K_F3]: # по нажатию кнопки
+                pygame.mixer.Sound.play(bulletSound)
+                allBullets.append(Bullet(dino_x + dino_w, dino_y+28)) # создаём выстрел в массив
+                cooldown = 50
+        else:
+            printText("Cooldown time: " + str(cooldown // 10), 482, 40)
+            cooldown -= 1
+
+        for bullet in allBullets:
+            if not bullet.move(): # перемещаем выстрел по экрану
+                allBullets.remove(bullet) # удаляем выстрел из массива

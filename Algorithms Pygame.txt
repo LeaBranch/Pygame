@@ -1,0 +1,64 @@
+Алгоритмы Pygame
+
+==========================================================
+Алгоритм параболического ПРЫЖКА
+-------------------------------
+
+usr_y = 10 # текущее положение персонажа по у
+jump counter = 30 # счётчик + на сколько будет прыгать персонаж (от -30 до +30)
+make_jump = True # работа прыжка (например, если нажали кнопку)
+
+def jump():
+    global usr_y, jump_counter, make jump
+    if jump_counter >= -30:
+        usr_y -= jump_counter
+        jump_counter -= 1 
+    else: 
+        jump counter = 30
+        make_jump = False
+
+while(1):
+...
+    if keys[pygame.K_SPACE]:
+        make_jump = True
+
+    if make_jump:
+        jump()
+
+    usr = pygame.draw.rect(screenMode, gold, (usr_x, usr_y, usr_w, usr_h))
+...
+
+==========================================================
+Перемещение объекта по экрану.
+
+def move():
+global usr_x, usr_y, usr_width, usr_heigh
+    if usr_x >= -usr_width:
+        pygame.draw.rect(display, (color rgb), (usr_x, usr_y, usr_width, usr_heigt)) # рисуем объект
+        usr_x -= 4
+    else:
+        pass # вне экрана можно перемесить куда хочешь
+
+========================================================
+-------ПРОВЕРКА КОЛЛИЗИИ С МАЛЕНЬКИМ КАКТУСОМ
+
+def checkCollision(barriers):
+    # global make_jump, jump_counter
+    for barrier in barriers:
+        if (barrier.y == 474): # little cactus
+            if not make_jump: # если не сделан прыжок, проверяем по х
+                if (barrier.x <= (dino_x + dino_w - 35) <= (barrier.x + barrier.w)):
+                    return True
+
+            elif (jump_counter >= 0): # первая половина прыжка
+                if ((dino_y + dino_h - 5) >= barrier.y): # проверка по у
+                    if (barrier.x <= (dino_x + dino_w - 35) <= (barrier.x + barrier.w)): # проверка по х
+                        return True
+
+            else: # вторая половина прыжка
+                if ((dino_y + dino_h - 10) >= barrier.y): # проверка по у
+                    if (barrier.x <= dino_x <= (barrier.x + barrier.w)):
+                        return True
+
+if (checkCollision(cactusArr)):
+    game = False
