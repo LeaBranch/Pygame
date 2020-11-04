@@ -6,7 +6,7 @@ class State(Enum):
     CONTINUE = 2,
     CHOOSE_THEME = 3
     CHOOSE_HERO = 4
-    CHOOSE_LVL = 5
+    LEVEL_2 = 5
     QUIT = 6
 
 class GameState():

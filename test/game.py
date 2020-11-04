@@ -1,6 +1,7 @@
 # import parameters as p
 
 import sys
+from time import sleep
 
 import bird as bird
 import images as img
@@ -10,9 +11,9 @@ from effects import *
 from states import *
 from bullet import *
 from save import *
+from inventory import inventory
 
 class Game():
-    
     def __init__(self):
         p.screen.set_caption("Run, Dino! Run!") # задаёт заголовок
         # pygame.display.set_icon("./assets/backgrounds/icon.png") # добавляет иконку
@@ -32,6 +33,7 @@ class Game():
         self.cooldown = 0
         self.dino_num = 0
         self.land_num = 0
+        self.level = 0
         self.game_state = GameState()
         self.saveData = Save()
         # self.bird = bird.Bird()
@@ -59,6 +61,9 @@ class Game():
                 self.saveData.save("land", self.land_num)
                 break
 
+            elif (self.game_state.check(State.LEVEL_2)):
+                self.chooseHero()
+                self.level_2()
 
     def showMenu(self):
         pygame.mixer.music.load("./assets/sounds/Big_Slinker.mp3") # фоновая музыка
@@ -68,6 +73,7 @@ class Game():
         startButton = Button(288, 70)
         continueButton = Button(225, 70)
         quitButton = Button(120, 70)
+        levelButton = Button(288, 70)
 
 
         show = True
@@ -93,6 +99,10 @@ class Game():
             if (quitButton.draw(350, 400, "Quit", font_size = 50)):
                 self.game_state.change(State.QUIT)
                 return 
+
+            if (levelButton.draw(270, 500, "Level 2", font_size = 50)):
+                self.game_state.change(State.LEVEL_2)
+                return
 
 
             draw_mouse()
@@ -129,6 +139,11 @@ class Game():
 
         allBullets = []
 
+        trigger_coal = False
+        trigger_emerald = False
+        trigger_ruby = False
+
+
         while(game): # рабочий цикл
             for event in pygame.event.get():
                 if (event.type == pygame.QUIT): sys.exit() # закрываем приложение по нажатию красной кнопки
@@ -139,6 +154,26 @@ class Game():
 
             img.setTheme(self.land_num)
             screenMode.blit(img.land, (0, 0))
+
+            inventory.draw_panel()
+
+            if keys[pygame.K_TAB]:
+                inventory.draw()
+
+            if (keys[pygame.K_1]):
+                trigger_coal = True
+
+            if (trigger_coal == True):
+                trigger_coal = False
+                inventory.increase("coal")
+            
+            if keys[pygame.K_2]:
+                inventory.increase("emerald")
+                sleep(0.5)
+
+            if keys[pygame.K_3]:
+                inventory.increase("ruby")
+                sleep(0.5)
 
             if keys[pygame.K_F10]:
                 sys.exit()
@@ -228,7 +263,6 @@ class Game():
             p.clock.tick(15)
 
 
-
     @staticmethod
     def paused():
         paused = True
@@ -308,6 +342,92 @@ class Game():
         for bird in birds:
             for bullet in bullets:
                 bird.checkDamage(bullet)
+
+    def choose_lvl(self):
+
+        lvl_1 = Button(185, 70)
+        lvl_2 = Button(165, 70)
+
+        while True:
+            for event in pygame.event.get():
+                if (event.type == pygame.QUIT): sys.exit() # закрываем приложение по нажатию красной кнопки
+
+            p.screenMode.fill((255, 255, 255))
+
+            if (lvl_1.draw(290, 200, "Levevl 1", font_size = 50)):
+                    self.level = 1
+                    return
+
+            if (lvl_2.draw(300, 300, "Level 2", font_size = 50)):
+                    self.level = 2
+                    return
+            
+            p.screen.update()
+            p.clock.tick(60)  
+
+    def level_2(self):
+        game = True
+
+        cactusArr = [] # создание кактусов
+        self.create_cactusArr(cactusArr) # заполнение массива
+        self.create_cactusArr(cactusArr)
+        self.create_cactusArr(cactusArr)
+
+        cloud = self.open_random_objects()
+
+        heart = Object(p.width, 280, 30, 4, img.healthIMG)
+
+        while(game): # рабочий цикл
+            for event in pygame.event.get():
+                if (event.type == pygame.QUIT): sys.exit() # закрываем приложение по нажатию красной кнопки
+
+            keys = pygame.key.get_pressed()
+            mouse = pygame.mouse.get_pos()
+            click = pygame.mouse.get_pressed()        
+
+            img.setTheme(3)
+            screenMode.blit(img.land, (0, 0))
+
+            if keys[pygame.K_F10]:
+                sys.exit()
+
+            if keys[pygame.K_SPACE]: # прыжок динозавра
+                self.make_jump = True 
+                if (0 < self.jump_counter < 27):
+                    if (not self.jump_num):
+                        self.jump_num += 1
+                        self.jump_counter = 30
+
+            if self.make_jump:
+                self.jump()
+
+            self.draw_cactusArr(cactusArr) # рисуем кактусы
+            # self.moveObjects(cloud) # рисуем камни и облака 
+
+            self. countScores(cactusArr) # считаем очки и добавляем их
+
+            printText("Scores: " + str(self.scores), 600, 10)
+
+            self.drawDino() # рисуем динозавра
+            
+            if keys[pygame.K_ESCAPE]: # пауза
+                self.paused()
+            
+            heart.move()
+            self.heartPlus(heart)
+
+            if (self.checkCollision(cactusArr)):# or (self.checkCollision(bird.birdBullets, for_bird = True)): # если коллизия - -здоровье
+                pygame.mixer.music.stop()
+                pygame.mixer.Sound.play(fallSound)
+                game = False
+
+            self.showHealth()
+
+            draw_mouse()
+
+            p.screen.update()
+            p.clock.tick(60)
+        return self.game_over()
 
     def chooseHero(self):
         hero_1 = Button(185, 70)
