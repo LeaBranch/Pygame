@@ -44,6 +44,8 @@ def get_input():
 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
+    # keys = pygame.key.get_pressed()
+
 
     if (input_rect.collidepoint(mouse[0], mouse[1]) and click[0]):
         need_input = True
