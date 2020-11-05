@@ -143,6 +143,7 @@ class Game():
         trigger_emerald = False
         trigger_ruby = False
 
+        hold_left = True
 
         while(game): # рабочий цикл
             for event in pygame.event.get():
@@ -156,6 +157,14 @@ class Game():
             screenMode.blit(img.land, (0, 0))
 
             inventory.draw_panel()
+
+            if (click[0]) and (not hold_left):
+                inventory.set_start_cell(mouse[0], mouse[1])
+                hold_left = True
+            if (hold_left and not click[0]):
+                inventory.set_end_cell(mouse[0], mouse[1])
+                hold_left = False
+
 
             if keys[pygame.K_TAB]:
                 inventory.draw()
