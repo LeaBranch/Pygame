@@ -4,7 +4,7 @@ from images import light
 
 
 need_input = False
-input_text = '|'
+input_text = ''
 input_tick = 30
 
 
@@ -35,10 +35,10 @@ def draw_mouse():
             p.mouseCounter = 0
             p.need_draw_click = False
 
-def get_input():
+def get_input(x, y):
     global need_input, input_text, input_tick
 
-    input_rect = pygame.Rect(20, 400, 250, 70)
+    input_rect = pygame.Rect(x, y, 250, 70)
 
     pygame.draw.rect(p.screenMode, (255, 255, 255), input_rect)
 
@@ -53,25 +53,29 @@ def get_input():
     if (need_input):
         for event in pygame.event.get():
             if (need_input and event.type == pygame.KEYDOWN):
-                input_text = input_text.replace("|", '')
-                input_tick = 30
+                # input_text = input_text.replace("|", '')
+                # input_tick = 30
 
-                if (event.type == pygame.K_RETURN):
+                if (event.key == pygame.K_RETURN):
                     need_input = False
-                    input_text = ''
-                elif (event.type == pygame.K_BACKSPACE):
+                    message = input_text
+                    # input_text = ''
+                    return message
+                elif (event.key == pygame.K_BACKSPACE):
                     input_text = input_text[:-1]
                 else:
                     if (len(input_text) < 10):
                         input_text += event.unicode
-                input_text += "|"
+                # input_text += "|"
 
     if (len(input_text)):
         printText(message = input_text, x = input_rect.x+10, y = input_rect.y+10, font_size = 50)
 
-    input_tick -= 1
-    if (input_tick == 0):
-        input_text = input_text[:-1]
-    if (input_tick == -30):
-        input_text += "|"
-        input_tick = 30
+    # input_tick -= 1
+    # if (input_tick == 0):
+    #     input_text = input_text[:-1]
+    # if (input_tick == -30):
+    #     input_text += "|"
+    #     input_tick = 30
+
+    return None

@@ -12,6 +12,7 @@ from states import *
 from bullet import *
 from save import *
 from inventory import inventory
+from hightscores import *
 
 class Game():
     def __init__(self):
@@ -36,6 +37,8 @@ class Game():
         self.level = 0
         self.game_state = GameState()
         self.saveData = Save()
+        self.saveData.save("hs", {})
+        self.hight_scores = Hightscore(self.saveData.get("hs"))
         # self.bird = bird.Bird()
         # self.Bullet = Bullet()
 
@@ -59,6 +62,7 @@ class Game():
                 self.saveData.save("max", self.maxScores)
                 self.saveData.save("dino", self.dino_num)
                 self.saveData.save("land", self.land_num)
+                self.saveData.save("hs", self.hight_scores.hs_table)
                 break
 
             elif (self.game_state.check(State.LEVEL_2)):
@@ -107,7 +111,7 @@ class Game():
 
             draw_mouse()
 
-            get_input()
+            # get_input()
 
             # if keys[pygame.K_TAB]:
             #     need_input = True
@@ -256,27 +260,43 @@ class Game():
         if (self.scores > self.maxScores):
             self.maxScores = self.scores
 
+        got_name = False
         stopped = True
         while stopped:
             for event in pygame.event.get():
                 if (event.type == pygame.QUIT): sys.exit() # закрываем приложение по нажатию красной кнопки
 
-            printText("Game over. Press Enter to play again, or Esc to exit", 15, 300)
-            printText("Max scores: " + str(self.maxScores), 300, 350)
+ 
+            screenMode.blit(img.land, (0, 0))
+
+            printText("Game over. Press Tab to play again, or Esc to exit", 30, 50)
+            printText("Max scores: " + str(self.maxScores), 300, 100)
+
+            if (not got_name):
+                printText("Enter your name: ", 40, 150)
+                name = get_input(40, 200)
+                if (name):
+                    got_name = True
+                    self.hight_scores.update(name, self.scores)
+            else:
+                printText("Name: ", 40, 150)
+                printText("Scores: ", 290, 150)
+                self.hight_scores.print_1(40, 200)
 
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_RETURN]:
-                return True
 
             if keys[pygame.K_F10]:
                 sys.exit()
+
+            if keys[pygame.K_TAB]:
+                return True
 
             if keys[pygame.K_ESCAPE]:
                 self.game_state.change(State.QUIT)
                 return False
 
             p.screen.update()
-            p.clock.tick(15)
+            # p.clock.tick(15)
 
 
     @staticmethod
