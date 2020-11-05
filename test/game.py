@@ -75,24 +75,12 @@ class Game():
         quitButton = Button(120, 70)
         levelButton = Button(288, 70)
 
-        need_input = False
-        input_text = ''
 
         show = True
         while(show): # рабочий цикл
             for event in pygame.event.get():
                 if (event.type == pygame.QUIT): sys.exit()
             keys = pygame.key.get_pressed()
-
-            if (need_input and event.type == pygame.KEYDOWN):
-                if (event.type == pygame.K_RETURN):
-                    need_input = False
-                    input_text = ''
-                elif (event.type == pygame.K_BACKSPACE):
-                    input_text = input_text[:-1]
-                else:
-                    if (len(input_text) < 10):
-                        input_text += event.unicode
 
             if keys[pygame.K_F1]:
                 sys.exit()
@@ -119,13 +107,15 @@ class Game():
 
             draw_mouse()
 
-            if keys[pygame.K_TAB]:
-                need_input = True
+            get_input()
 
-            printText(input_text, 500, 400, font_color = (255, 255, 255))
+            # if keys[pygame.K_TAB]:
+            #     need_input = True
+
+            # printText(input_text, 500, 400, font_color = (255, 255, 255))
             p.screen.update()
 
-            p.clock.tick(10)
+            p.clock.tick(50)
 
     def start_game(self):        
         # pygame.mixer.music.play(-1)
