@@ -3,7 +3,6 @@
 import sys
 from time import sleep
 
-import bird as bird
 import images as img
 from button import *
 from object import *
@@ -13,6 +12,8 @@ from bullet import *
 from save import *
 from inventory import inventory
 from hightscores import *
+from bird import *
+
 
 class Game():
     def __init__(self):
@@ -39,7 +40,7 @@ class Game():
         self.saveData = Save()
         self.saveData.save("hs", {})
         self.hight_scores = Hightscore(self.saveData.get("hs"))
-        # self.bird = bird.Bird()
+        # self.bird = Bird()
         # self.Bullet = Bullet()
 
     def start(self):
@@ -121,7 +122,7 @@ class Game():
 
             p.clock.tick(50)
 
-    def start_game(self):        
+    def start_game(self):   
         # pygame.mixer.music.play(-1)
 
         while self.game_cycle():
@@ -144,8 +145,8 @@ class Game():
 
         heart = Object(p.width, 280, 30, 4, img.healthIMG)
 
-        bird1 = bird.Bird(-80)
-        bird2 = bird.Bird(-109)
+        bird1 = Bird(-80)
+        bird2 = Bird(-109)
         allBirds = [bird1 , bird2]
 
         allBullets = []
@@ -243,7 +244,7 @@ class Game():
             heart.move()
             self.heartPlus(heart)
 
-            if (self.checkCollision(cactusArr)):# or (self.checkCollision(bird.birdBullets, for_bird = True)): # если коллизия - -здоровье
+            if (self.checkCollision(cactusArr)) or (self.checkCollision(birdBullets, for_bird = True)): # если коллизия - -здоровье
                 pygame.mixer.music.stop()
                 pygame.mixer.Sound.play(fallSound)
                 game = False
@@ -634,14 +635,14 @@ class Game():
                                     return False
                                 else:
                                     return True
-            # if for_bird: 
-            #     if (p.dino_x <= barrier.x <= (p.dino_x + p.dino_w)):
-            #         if (p.dino_y <= barrier.y <= (p.dino_y + p.dino_h)):
-            #             if self.checkHealth(): 
-            #                     barriers.remove(barrier)
-            #                     return False
-            #             else:
-            #                 return True
+            if for_bird: 
+                if (p.dino_x <= barrier.x <= (p.dino_x + p.dino_w)):
+                    if (p.dino_y <= barrier.y <= (p.dino_y + p.dino_h)):
+                        if self.checkHealth(): 
+                                barriers.remove(barrier)
+                                return False
+                        else:
+                            return True
 
         # if for_bird:
         #     for bullet in bird.birdBullets:

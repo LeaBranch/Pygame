@@ -15,3 +15,7 @@ dino_w = 60
 dino_h = 100
 dino_x = width // 3
 dino_y = height - dino_h - 100
+
+away_y = 0
+
+birdBullets = []

@@ -137,7 +137,7 @@ class Inventory:
 
 
     def swap_cells(self):
-        if (self.end_cell < 8):
+        if (self.end_cell < 7):
             temp = self.whole_inventory[self.end_cell]
             if (self.start_cell < 8):
                 self.whole_inventory[self.end_cell] = self.whole_inventory[self.start_cell]

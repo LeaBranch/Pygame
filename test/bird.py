@@ -19,7 +19,7 @@ class Bird():
         self.come = True
         self.go_away = False
         self.cd_shoot = 0
-        self.birdBullets = []
+        self.birdBullets = p.birdBullets
 
     def draw(self):
         if (self.IMGcount == 30):
@@ -62,7 +62,7 @@ class Bird():
         if not self.cd_shoot:
             pygame.mixer.Sound.play(bulletSound)
             newBullet = Bullet(self.x, self.y)
-            newBullet.findPath(((p.dino_x + p.dino_w) // 2), (p.dino_y + p.dino_h))
+            newBullet.findPath(((p.dino_x + p.dino_w)), (p.dino_y))
 
             self.birdBullets.append(newBullet)
             self.cd_shoot = 200
@@ -73,3 +73,5 @@ class Bird():
         for bullet in self.birdBullets:
             if (not bullet.move_to(reverse = True)):
                 self.birdBullets.remove(bullet)
+
+# bird = Bird(p.away_y)
