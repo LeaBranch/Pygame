@@ -263,22 +263,23 @@ class Game():
 
         got_name = False
         stopped = True
+        p.count += 1
         while stopped:
             for event in pygame.event.get():
                 if (event.type == pygame.QUIT): sys.exit() # закрываем приложение по нажатию красной кнопки
 
- 
             screenMode.blit(img.land, (0, 0))
 
             printText("Game over. Press Tab to play again, or Esc to exit", 30, 50)
             printText("Max scores: " + str(self.maxScores), 300, 100)
 
             if (not got_name):
-                printText("Enter your name: ", 40, 150)
-                name = get_input(40, 200)
-                if (name):
-                    got_name = True
-                    self.hight_scores.update(name, self.scores)
+                if(p.count <= 10):
+                    printText("Enter your name: ", 40, 150)
+                    name = get_input(40, 200)
+                    if (name):
+                        got_name = True
+                        self.hight_scores.update(name, self.scores)
             else:
                 printText("Name: ", 40, 150)
                 printText("Scores: ", 290, 150)
